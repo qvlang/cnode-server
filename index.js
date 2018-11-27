@@ -16,7 +16,7 @@ const handleErr = async (ctx,next)=>{
     });
     await next()
   }catch(err){
-    ctx.status = err.statusCode || err.status || 500;
+    ctx.status = err.response.statusCode || err.response.status || 500;
     ctx.body = {
       message: err.message
     };

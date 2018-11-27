@@ -6,21 +6,27 @@ const qs = require("query-string");
 const baseUrl =  "https://cnodejs.org/api/v1";
 route.post("/login", async (ctx) =>{
   const resBody = ctx.request.body;
-  const res = await axios.post(`${baseUrl}/accesstoken`,{
-    accesstoken: resBody.accessToken
-  });
-  if(res.data.success) {
-    ctx.session.user = {
-      accessToken: resBody.accessToken,
-      loginName: res.data.loginname,
-      id: res.data.id,
-      avatarUrl: res.data.avatar_url
+  try {
+    const res = await axios.post(`${baseUrl}/accesstoken`,{
+      accesstoken: resBody.accessToken
+    });
+    if(res.status ===200 && res.data.success) {
+      ctx.session.user = {
+        accessToken: resBody.accessToken,
+        loginName: res.data.loginname,
+        id: res.data.id,
+        avatarUrl: res.data.avatar_url
+      }
+      ctx.body = {
+        success: true,
+        data: res.data
+      }
     }
-  }
-  ctx.body = {
-    success: true,
-    data: res.data,
-    session: ctx.session
+  }catch (err) {
+    if(err.response.status === 401){
+      ctx.status = 200;
+      ctx.body = err.response.data
+    }
   }
 });
 
